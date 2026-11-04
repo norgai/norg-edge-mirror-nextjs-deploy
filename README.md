@@ -1,6 +1,6 @@
-# NORG Edge Router — Vercel middleware
+# NORG Edge Router — Next.js and Vercel middleware
 
-This branch holds **`@norg-ai/edge-router-vercel`**, the npm package version of NORG's edge router for sites hosted on **Vercel**. That covers Next.js apps (`middleware.ts`, or `proxy.ts` on Next.js 16) and any other Vercel project through Vercel Routing Middleware.
+This repo holds **`@norg-ai/edge-router-vercel`**, the npm package version of NORG's edge router for sites hosted on **Vercel**. That covers Next.js apps (`middleware.ts`, or `proxy.ts` on Next.js 16) and any other Vercel project through Vercel Routing Middleware.
 
 You don't change DNS, create an API token or deploy a worker. Install a package, wrap your middleware, and add two environment variables.
 
@@ -18,7 +18,7 @@ export default withNorgEdge(yourExistingMiddleware) // or: norgEdgeMiddleware()
 **Install guide, configuration and troubleshooting: [`vercel/README.md`](vercel/README.md)**, also shown on [npmjs.com](https://www.npmjs.com/package/@norg-ai/edge-router-vercel).
 Customer guide: [app.norg.ai/help/vercel-middleware](https://app.norg.ai/help/vercel-middleware).
 
-> **On Cloudflare?** Use the Cloudflare Worker on [`main`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/main) instead. Other platforms are listed under [Other platforms](#other-platforms).
+> **On Cloudflare?** Use the [Cloudflare Worker](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy) instead. Other platforms are listed under [Other platforms](#other-platforms).
 
 ---
 
@@ -89,14 +89,14 @@ bash e2e/run.sh                  # needs pnpm; packs the package into a real Nex
 
 ## Other platforms
 
-| Platform | Branch | Install guide |
-|---|---|---|
-| **Cloudflare** | [`main`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/main) | [README](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/blob/main/README.md) |
-| **AWS CloudFront** | [`feature/aws-cloudfront`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/aws-cloudfront) | [`aws/README.md`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/blob/feature/aws-cloudfront/aws/README.md) |
-| **Fastly Compute** | [`feature/fastly-compute`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/fastly-compute) | [`fastly/README.md`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/blob/feature/fastly-compute/fastly/README.md) |
-| **Bunny Edge Scripting** | [`feature/bunny-edge-scripting`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/bunny-edge-scripting) | [`bunny/README.md`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/blob/feature/bunny-edge-scripting/bunny/README.md) |
-| **WordPress (no CDN)** | [`feature/wordpress-plugin`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/wordpress-plugin) | [README](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/blob/feature/wordpress-plugin/README.md) |
-| **Vercel** | `feature/vercel-middleware` (this branch) | [`vercel/README.md`](vercel/README.md) |
+| Platform | Where it lives |
+|---|---|
+| **Next.js and Vercel** | This repo. Install guide: [`vercel/README.md`](vercel/README.md) |
+| **Cloudflare** | [`norg-edge-mirror-cloudflare-deploy`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy) |
+| **AWS CloudFront** | [`norg-edge-mirror-cloudfront-deploy`](https://github.com/norgai/norg-edge-mirror-cloudfront-deploy) |
+| **Fastly Compute** | [`norg-edge-mirror-fastly-deploy`](https://github.com/norgai/norg-edge-mirror-fastly-deploy) |
+| **Bunny Edge Scripting** | [`norg-edge-mirror-bunny-deploy`](https://github.com/norgai/norg-edge-mirror-bunny-deploy) |
+| **WordPress (no CDN)** | [`feature/wordpress-plugin`](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/wordpress-plugin) in the Cloudflare repo |
 
 ## Support
 
