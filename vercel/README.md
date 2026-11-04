@@ -183,4 +183,4 @@ export default withNorgEdge(myMiddleware, {
 
 ## Licence
 
-MIT © NORG.ai. Source: [github.com/norgai/norg-edge-mirror-cloudflare-deploy](https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/tree/feature/vercel-middleware/vercel)
+MIT © NORG.ai. Source: [github.com/norgai/norg-edge-mirror-nextjs-deploy](https://github.com/norgai/norg-edge-mirror-nextjs-deploy/tree/feature/vercel-middleware/vercel)
