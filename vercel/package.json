@@ -14,10 +14,10 @@
     "norg"
   ],
   "homepage": "https://app.norg.ai/help/vercel-middleware",
-  "bugs": "https://github.com/norgai/norg-edge-mirror-cloudflare-deploy/issues",
+  "bugs": "https://github.com/norgai/norg-edge-mirror-nextjs-deploy/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/norgai/norg-edge-mirror-cloudflare-deploy.git",
+    "url": "git+https://github.com/norgai/norg-edge-mirror-nextjs-deploy.git",
     "directory": "vercel"
   },
   "license": "MIT",
