@@ -59,7 +59,7 @@ The three rules every NORG router follows hold here unchanged:
 vercel/                    the npm package (@norg-ai/edge-router-vercel)
   src/index.js             createNorgEdge(): framework-neutral, usable as Vercel Routing Middleware
   src/next.js              withNorgEdge() / norgEdgeMiddleware() for Next.js
-  src/router.js            the request pipeline (port of workers/edge-router-worker.js)
+  src/router.js            the request pipeline (port of the Cloudflare worker)
   src/lib/                 config (NORG_* env vars), client IP + geo, origin read, heartbeat
   types/                   hand-written .d.ts, copied into dist/
   build.mjs                esbuild (pinned, via npx) → dist/; two entries share one chunk
