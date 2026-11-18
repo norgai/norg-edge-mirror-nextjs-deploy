@@ -105,7 +105,7 @@ Returning nothing tells Vercel to continue to your site; returning a response se
 ```bash
 # Is it deployed, configured and entitled?
 curl -s -H "x-norg-edge-check: <your-site-key>" https://your-site.example/ | head -c 200
-# {"site_id":"…","version":"0.2.0","env":"production","disabled":false,"platform":"vercel","entitled":true,…}
+# {"site_id":"…","version":"0.3.0","env":"production","disabled":false,"platform":"vercel","entitled":true,…}
 
 # People get the site unchanged: expect no output
 curl -sI https://your-site.example/some-page/ | grep -i x-norg-edge
@@ -127,6 +127,7 @@ Each option can be set as an environment variable or passed to the factory: `wit
 | `NORG_SITE_KEY` | `siteKey` | — | Required. Keep it in a Sensitive variable |
 | `NORG_EDGE_DISABLED` | `disabled` | `false` | Kill switch: every request goes to your site |
 | `NORG_CAPTURE_ONLY` | `captureOnly` | `false` | Record-only mode (below). NORG can also switch it on for your site |
+| `NORG_EDGE_PATHS` | `paths` | every path | Limit NORG to part of your site, e.g. `/help` or `/help,/docs` (below) |
 | `NORG_STRIP_FALLBACK_ENABLED` | `stripFallback` | `true` | Serve unrendered pages to agents stripped to their text |
 | `NORG_LAZY_RENDER_ENABLED` | `lazyRender` | `true` | Ask NORG to render pages agents request |
 | `NORG_API_URL` / `NORG_CONTENT_BASE` | `apiUrl` / `contentBase` | NORG production | Point at another NORG environment |
@@ -146,6 +147,17 @@ export default withNorgEdge(myMiddleware, {
 ```
 
 ---
+
+## Limit NORG to part of your site
+
+Set `paths` (or `NORG_EDGE_PATHS`) and NORG acts only on those paths and below. Every other request goes straight to your app with no NORG call, so an app's signed-in area never touches the router.
+
+```ts
+// proxy.ts (Next.js 16) or middleware.ts
+export default withNorgEdge(yourExistingMiddleware, { paths: ['/help'] })
+```
+
+NORG's own surfaces stay in scope whatever you set, because the pages NORG serves link to them: `/.norg/*` (the mirror's stylesheet), `/llms.txt` and the other discovery files, the MCP surface (`/.well-known/mcp.json`, `*/mcp`), the OpenAI feeds and the agentic subtree (`/ai/*`). A page's sibling files (`index.md`, `mcp.json`, …) follow the page. The health probe answers on any path. Leave `paths` unset to cover the whole site, as before.
 
 ## How it behaves on Vercel
 

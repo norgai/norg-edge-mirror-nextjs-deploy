@@ -84,6 +84,7 @@ import { reportPassthrough } from "../../core/telemetry.js";
 import { visitHeader } from "../../core/visit.js";
 
 import { captureActive, handleCapture } from "./capture.js";
+import { inScope, parseScope } from "./scope.js";
 import { maybeHeartbeat } from "./lib/heartbeat.js";
 import { fetchOrigin } from "./lib/origin.js";
 import { clientIp, edgeRegion, visitView } from "./lib/request.js";
@@ -406,6 +407,9 @@ async function serveClassified(request, env, url, feed, options) {
  */
 export async function handleRequest(request, env, options = {}) {
   if (isHealthProbe(request, env)) return answerHealthProbe(request, env);
+  // Outside the configured paths (and not a NORG surface): the site serves it,
+  // with no NORG call at all.
+  if (!inScope(new URL(request.url).pathname, parseScope(env.EDGE_PATHS))) return null;
   if (isPassthrough(request, env)) return null;
   // Record-only install: decided before the fast path and any NORG call, so a
   // person arriving from an AI answer is counted and nobody waits on NORG.
