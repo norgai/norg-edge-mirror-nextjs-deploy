@@ -31,7 +31,7 @@ const PASSTHROUGH_SERVED = new Set(["origin", "origin_thin"]);
  * @param {Object} body JSON body.
  * @returns {Promise<?Response>} Response, or null on failure.
  */
-async function postControl(env, path, body) {
+export async function postControl(env, path, body) {
   try {
     const response = await edgeFetch(env, `${binding(env, "NORG_API_URL")}${path}`, {
       method: "POST",
@@ -58,9 +58,10 @@ async function postControl(env, path, body) {
  * @param {Request} request Incoming request.
  * @param {Object} classification Bot classification.
  * @param {string} served How the request was answered.
+ * @param {Object} [extra] Extra fields (e.g. verified_source).
  * @returns {Object} JSON body.
  */
-function eventBody(request, classification, served) {
+function eventBody(request, classification, served, extra = {}) {
   const url = new URL(request.url);
   return {
     domain: url.hostname,
@@ -74,6 +75,7 @@ function eventBody(request, classification, served) {
     raw_word_count: null,
     response_status: null,
     ...viewerAttributes(request.headers),
+    ...extra,
   };
 }
 
@@ -84,13 +86,14 @@ function eventBody(request, classification, served) {
  * @param {Request} request Incoming request.
  * @param {Object} classification Bot classification.
  * @param {string} served How the request was answered.
+ * @param {Object} [extra] Extra fields for the event body.
  * @returns {Promise<void>} Settles with the call; never rejects.
  */
-export function fireEdgeEvent(env, request, classification, served) {
+export function fireEdgeEvent(env, request, classification, served, extra = {}) {
   if (PASSTHROUGH_SERVED.has(served) && env.EDGE_EVENTS_VERBOSE !== "true") {
     return Promise.resolve();
   }
-  return postControl(env, "/api/v1/edge/events", eventBody(request, classification, served))
+  return postControl(env, "/api/v1/edge/events", eventBody(request, classification, served, extra))
     .then(() => undefined)
     .catch(() => undefined);
 }
