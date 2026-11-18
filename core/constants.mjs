@@ -1,20 +1,14 @@
 /**
  * Constant tables shared with the Cloudflare edge-router worker.
  *
- * @description Provider-neutral constants for the CloudFront edge router.
+ * @description Provider-neutral constants for the Vercel edge router.
  *
- * These are a deliberate COPY of the declarations in
- * `workers/edge-router-worker.js`, not an import. The Cloudflare worker's
- * bundle is pinned by SHA-256 in content-craft and its EDGE_SCRIPT_VERSION is
- * matched against a backend setting, so refactoring shared values out of that
- * file would change the shipped bundle and tell every installed Cloudflare site
- * an update is available until the backend catches up. Copying costs nothing at
- * runtime; the divergence risk is closed instead by
- * `aws/tests/constants-parity.test.mjs`, which compares the declaration text in
- * both files and fails on any drift.
- *
- * Keep every declaration below BYTE-IDENTICAL to its counterpart (modulo the
- * `export ` prefix) or that test will fail.
+ * These are a deliberate COPY of the declarations in the Cloudflare worker
+ * (norgai/norg-edge-mirror-cloudflare-deploy, workers/edge-router-worker.js),
+ * not an import: that bundle is pinned by SHA-256, so refactoring shared values
+ * out of it would change the shipped worker. Keep every declaration below
+ * BYTE-IDENTICAL to its counterpart (modulo the `export ` prefix) when the
+ * worker changes.
  */
 
 // Baked binding defaults (EDGEPAR 04). Five bindings never vary across manual
