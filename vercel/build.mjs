@@ -27,7 +27,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const outdir = join(here, "dist");
 
 // Names that must NEVER appear in code that ships into a customer's project.
-// Mirrors the deploy-time guard in content-craft's worker_source.py.
+// Mirrors NORG's deploy-time guard.
 const FORBIDDEN_NAMES = [
   "CRAWLER_EVENT_SECRET",
   "WORKER_AUTH_SECRET",
