@@ -24,6 +24,14 @@ export interface NorgEdgeOptions {
   stripFallback?: boolean;
   /** Ask NORG to render pages agents request. Default true. */
   lazyRender?: boolean;
+  /** Record-only mode: serve the site untouched, report visits to NORG. */
+  captureOnly?: boolean;
+  /**
+   * Limit the router to these paths and below (e.g. ["/help"]). NORG's own
+   * surfaces (/.norg/*, discovery files, MCP, the agentic subtree) are always
+   * included. Unset: every path.
+   */
+  paths?: string[] | string;
   /**
    * Reads the visitor's IP. Only needed off Vercel: on Vercel the platform's
    * own x-real-ip is used. Off Vercel without this, no agent is verified.

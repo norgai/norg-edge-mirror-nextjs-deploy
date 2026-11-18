@@ -27,7 +27,7 @@ import { BINDING_DEFAULTS } from "../../../core/constants.mjs";
  * deployable; content-craft compares it against EDGE_WORKER_VERSION_VERCEL.
  * tests/package.test.mjs fails if this disagrees with package.json.
  */
-export const EDGE_SCRIPT_VERSION = "0.2.0";
+export const EDGE_SCRIPT_VERSION = "0.3.0";
 
 export const EDGE_PLATFORM = "vercel";
 
@@ -49,6 +49,7 @@ function readProcessEnv() {
     NORG_LAZY_RENDER_ENABLED: process.env.NORG_LAZY_RENDER_ENABLED,
     NORG_EDGE_EVENTS_VERBOSE: process.env.NORG_EDGE_EVENTS_VERBOSE,
     NORG_CAPTURE_ONLY: process.env.NORG_CAPTURE_ONLY,
+    NORG_EDGE_PATHS: process.env.NORG_EDGE_PATHS,
   };
 }
 
@@ -64,6 +65,8 @@ const FIELDS = {
   lazyRender: ["NORG_LAZY_RENDER_ENABLED", "LAZY_RENDER_ENABLED"],
   eventsVerbose: ["NORG_EDGE_EVENTS_VERBOSE", "EDGE_EVENTS_VERBOSE"],
   captureOnly: ["NORG_CAPTURE_ONLY", "CAPTURE_ONLY"],
+  // Array (option) or comma-separated string (env); see src/scope.js.
+  paths: ["NORG_EDGE_PATHS", "EDGE_PATHS"],
 };
 
 /**

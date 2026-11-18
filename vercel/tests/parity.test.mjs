@@ -172,5 +172,5 @@ test("the health probe reports capture_only", async () => {
   );
   const body = await result.json();
   assert.equal(body.capture_only, true);
-  assert.equal(body.version, "0.2.0");
+  assert.equal(body.version, "0.3.0");
 });
