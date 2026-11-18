@@ -1,6 +1,6 @@
 {
   "name": "@norg-ai/edge-router-vercel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Serve NORG's AI-optimised pages to verified AI agents from your Vercel project's middleware. People and search engines always get your site, unchanged.",
   "keywords": [
     "vercel",

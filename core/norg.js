@@ -204,9 +204,10 @@ export function strippedResponse(html, status, env) {
  *
  * @param {Object} env Install config.
  * @param {boolean} entitled Whether this container holds an authenticated feed.
+ * @param {boolean} [captureOnly] Whether record-only mode is on.
  * @returns {Response} JSON status.
  */
-export function healthResponse(env, entitled) {
+export function healthResponse(env, entitled, captureOnly = false) {
   return new Response(
     JSON.stringify({
       site_id: env.SITE_ID || null,
@@ -219,6 +220,9 @@ export function healthResponse(env, entitled) {
       // router passes everything through and is otherwise indistinguishable
       // from not being installed at all.
       entitled,
+      // Record-only mode as this container sees it now (setting OR feed), so
+      // an operator can confirm a site has entered or left capture mode.
+      capture_only: captureOnly,
       ts: Date.now(),
     }),
     {

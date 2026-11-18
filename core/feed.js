@@ -71,6 +71,10 @@ export async function readFeedBody(response) {
       // Per-route mirror skip: paths an operator marked to pass through to
       // origin. An array of normalised EdgeRoute paths.
       skipPaths: Array.isArray(data.skip_paths) ? data.skip_paths : [],
+      // Record-only mode, switched on by NORG for this site.
+      captureOnly: data.capture_only === true,
+      // Report people who arrive from an AI answer (capture mode only).
+      citationTrackingEnabled: data.citation_tracking_enabled === true,
       contentVersion: data.content_version || "",
       responseCache: {
         enabled: rc.enabled === true,
@@ -248,6 +252,18 @@ export function knownAgenticPathPrefix() {
  */
 export function isEntitled() {
   return feedCache.entitled;
+}
+
+/**
+ * Has NORG switched this site to record-only, per the feed already held?
+ *
+ * Synchronous on purpose: read on the human fast path, where no feed fetch
+ * may happen. A cold instance answers false until its first feed.
+ *
+ * @returns {boolean} True when the held, entitled feed says capture_only.
+ */
+export function isCaptureOnly() {
+  return feedCache.entitled === true && feedCache.captureOnly === true;
 }
 
 /**

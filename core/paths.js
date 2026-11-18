@@ -91,6 +91,7 @@ export function isOpenAiFeedPath(pathname) {
 export function isMcpPath(pathname) {
   return (
     pathname === "/.well-known/mcp.json" ||
+    pathname.endsWith("/mcp.json") ||
     pathname.endsWith("/mcp") ||
     pathname.endsWith("/sse")
   );

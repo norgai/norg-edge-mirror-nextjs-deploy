@@ -78,6 +78,21 @@ export function mayDivert(classification) {
 }
 
 /**
+ * Has NORG opted this unverifiable agent in to the mirror?
+ *
+ * For operators with no verifiable source (no published ranges), NORG can set
+ * a pattern's policy to "divert_unverified": the agent is served the mirror
+ * when one exists, tagged apart from verified traffic, and a miss never
+ * triggers a render.
+ *
+ * @param {Object} classification Classification from classifyAgent.
+ * @returns {boolean} True only when the published policy is "divert_unverified".
+ */
+export function mayDivertUnverified(classification) {
+  return classification.serving_policy === "divert_unverified";
+}
+
+/**
  * Verify the source against the operator's published CIDR set.
  *
  * Family-aware (workers/lib/cidr.mjs): an IPv6 client is measured against the

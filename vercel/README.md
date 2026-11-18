@@ -19,6 +19,7 @@ npm i @norg-ai/edge-router-vercel
 | Googlebot, Bingbot and other search crawlers | Your site, unchanged. Always; there is no setting to change this. |
 | A verified AI agent (GPTBot, ClaudeBot, PerplexityBot, …) on a page NORG has rendered | The NORG render, served at your own URL with no redirect |
 | A verified AI agent on a page not rendered yet | Your page, stripped down to its text, while NORG is asked to render it |
+| An AI agent with no verifiable source (no published IP ranges, e.g. DeepSeekBot) that NORG has explicitly opted in | The NORG render if one exists, otherwise your page unchanged. It never triggers a render, and its visits are reported separately |
 
 Three rules are built in and can't be switched off:
 
@@ -104,7 +105,7 @@ Returning nothing tells Vercel to continue to your site; returning a response se
 ```bash
 # Is it deployed, configured and entitled?
 curl -s -H "x-norg-edge-check: <your-site-key>" https://your-site.example/ | head -c 200
-# {"site_id":"…","version":"0.1.0","env":"production","disabled":false,"platform":"vercel","entitled":true,…}
+# {"site_id":"…","version":"0.2.0","env":"production","disabled":false,"platform":"vercel","entitled":true,…}
 
 # People get the site unchanged: expect no output
 curl -sI https://your-site.example/some-page/ | grep -i x-norg-edge
@@ -125,6 +126,7 @@ Each option can be set as an environment variable or passed to the factory: `wit
 | `NORG_SITE_ID` | `siteId` | — | Required |
 | `NORG_SITE_KEY` | `siteKey` | — | Required. Keep it in a Sensitive variable |
 | `NORG_EDGE_DISABLED` | `disabled` | `false` | Kill switch: every request goes to your site |
+| `NORG_CAPTURE_ONLY` | `captureOnly` | `false` | Record-only mode (below). NORG can also switch it on for your site |
 | `NORG_STRIP_FALLBACK_ENABLED` | `stripFallback` | `true` | Serve unrendered pages to agents stripped to their text |
 | `NORG_LAZY_RENDER_ENABLED` | `lazyRender` | `true` | Ask NORG to render pages agents request |
 | `NORG_API_URL` / `NORG_CONTENT_BASE` | `apiUrl` / `contentBase` | NORG production | Point at another NORG environment |
@@ -151,7 +153,8 @@ export default withNorgEdge(myMiddleware, {
 - **Background work** (refreshing the agent list, the liveness heartbeat) runs after the response through `waitUntil`, so no visitor waits for it.
 - **Timeouts:** every NORG call has its own short timeout, and a 10-second watchdog sits over the whole pipeline. Either one ends in your site, never an error.
 - **Caching:** NORG responses are `private, no-store`. Your own pages keep whatever caching they had.
-- **Verification is IP-based only.** Vercel exposes no verified-bot signal to middleware, so a crawler whose operator publishes no IP ranges isn't diverted.
+- **Verification is IP-based only.** Vercel exposes no verified-bot signal to middleware, so a crawler whose operator publishes no IP ranges isn't diverted, unless NORG has opted that operator in (served from existing renders only, and reported separately).
+- **Record-only (capture) mode:** with `NORG_CAPTURE_ONLY=true`, or when NORG switches it on, every request gets your site untouched and nothing is served differently. After the response, AI-agent visits are reported to NORG, and so are people who arrive from an AI answer (ChatGPT, Perplexity, Claude, Gemini, Copilot) when NORG has citation tracking on. That is the one case where a person's visit causes a NORG call, and it never delays their page. The health probe reports `capture_only`.
 
 ## Troubleshooting
 

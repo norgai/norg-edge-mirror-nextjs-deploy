@@ -51,6 +51,7 @@ import {
   anonymousClassification,
   classifyAgent,
   mayDivert,
+  mayDivertUnverified,
   verifiedSource,
 } from "../../core/agent.js";
 import { fastPathExit } from "../../core/fastpath.js";
@@ -82,6 +83,7 @@ import { countVisibleWords, stripHtml } from "../../core/strip.js";
 import { reportPassthrough } from "../../core/telemetry.js";
 import { visitHeader } from "../../core/visit.js";
 
+import { captureActive, handleCapture } from "./capture.js";
 import { maybeHeartbeat } from "./lib/heartbeat.js";
 import { fetchOrigin } from "./lib/origin.js";
 import { clientIp, edgeRegion, visitView } from "./lib/request.js";
@@ -205,10 +207,11 @@ async function serveOriginFirstArtifact(request, env, url, alternateFormatHeader
 async function handleMcp(request, env, url) {
   if (request.method === "POST") return forwardMcpToNorg(request, env, url);
   if (request.method !== "GET" && request.method !== "HEAD") return null;
-  const suffix =
-    url.pathname === "/.well-known/mcp.json"
-      ? "/.well-known/mcp.json"
-      : `${url.pathname.replace(/\/(mcp|sse)$/, "")}/mcp.json`;
+  // A plain */mcp.json is already the artifact's own path; */mcp and */sse
+  // name the page whose mcp.json to read.
+  const suffix = url.pathname.endsWith("/mcp.json")
+    ? url.pathname
+    : `${url.pathname.replace(/\/(mcp|sse)$/, "")}/mcp.json`;
   const { response } = await fetchFromNorg(env, suffix);
   return response ? mcpResponse(response) : null;
 }
@@ -352,7 +355,7 @@ async function serveAgent(request, env, url, classification) {
 async function answerHealthProbe(request, env) {
   await getBotFeed(env);
   maybeHeartbeat(env, "probe", edgeRegion(request));
-  return healthResponse(env, isEntitled());
+  return healthResponse(env, isEntitled(), captureActive(env));
 }
 
 /**
@@ -376,7 +379,15 @@ async function serveClassified(request, env, url, feed, options) {
     );
   }
   const classification = classifyAgent(userAgent, feed.patterns);
-  if (!classification.is_ai_bot || !mayDivert(classification)) return null;
+  if (!classification.is_ai_bot) return null;
+  // Operators with no verifiable source can be opted in per pattern:
+  // mirror-or-site only, tagged apart from verified traffic, and a miss never
+  // triggers a render.
+  if (mayDivertUnverified(classification)) {
+    maybeHeartbeat(env, "traffic", edgeRegion(request));
+    return serveAddressedMirror(request, env, url, url.pathname, classification, "mirror_unverified");
+  }
+  if (!mayDivert(classification)) return null;
   // A spoofable UA is not enough: the source IP must be the operator's.
   if (!verifiedSource(clientIp(request, options), feed.cidrRanges, classification)) return null;
   return serveAgent(request, env, url, classification);
@@ -396,6 +407,9 @@ async function serveClassified(request, env, url, feed, options) {
 export async function handleRequest(request, env, options = {}) {
   if (isHealthProbe(request, env)) return answerHealthProbe(request, env);
   if (isPassthrough(request, env)) return null;
+  // Record-only install: decided before the fast path and any NORG call, so a
+  // person arriving from an AI answer is counted and nobody waits on NORG.
+  if (captureActive(env)) return handleCapture(request, env, options);
 
   const url = new URL(request.url);
   const exit = fastPathExit(request, url, request.headers.get("user-agent") || "");
@@ -408,6 +422,8 @@ export async function handleRequest(request, env, options = {}) {
   // install. Refused, or never authenticated and unreachable, is a passthrough.
   const feed = await getBotFeed(env);
   if (!feed.entitled) return null;
+  // NORG switched this site to record-only after this container started.
+  if (feed.captureOnly) return handleCapture(request, env, options);
 
   const owned = await serveNorgOwnedSurface(request, env, url);
   if (owned !== undefined) return owned;
