@@ -55,6 +55,10 @@ export async function recordCapture(request, env, options) {
       return;
     }
     if (!feed.citationTrackingEnabled) return;
+    // The visitor id is a SHA-256 via Web Crypto: global on the Edge runtime
+    // and Node 19+, absent on Node 18's Node.js runtime, where the page-view
+    // is skipped rather than reported without its dedup key.
+    if (!globalThis.crypto || !globalThis.crypto.subtle) return;
     const detection = detectCitationReferral(request, url, url.hostname);
     if (!detection) return;
     const payload = await buildPageViewPayload(request, url, url.hostname, detection, "customer_zone", true);

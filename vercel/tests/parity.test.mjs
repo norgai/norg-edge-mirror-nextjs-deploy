@@ -114,7 +114,11 @@ test("capture: a verified agent gets the site and is reported as capture", async
   assert.equal(event.verified_source, true);
 });
 
-test("capture: a person arriving from ChatGPT is recorded as a citation page-view", async () => {
+const HAS_WEB_CRYPTO = Boolean(globalThis.crypto && globalThis.crypto.subtle);
+
+test("capture: a person arriving from ChatGPT is recorded as a citation page-view", {
+  skip: HAS_WEB_CRYPTO ? false : "no global Web Crypto on this Node version",
+}, async () => {
   const { result, calls } = await run(
     { userAgent: CHROME_UA, headers: { referer: "https://chatgpt.com/" } },
     { feed: CITATION_FEED },
@@ -125,6 +129,18 @@ test("capture: a person arriving from ChatGPT is recorded as a citation page-vie
   assert.equal(view.citation_source, "chatgpt");
   assert.equal(view.country, "AU");
   assert.equal(view.served_surface, "customer_zone");
+});
+
+test("capture: without Web Crypto a referred person is skipped, never a crash", {
+  skip: HAS_WEB_CRYPTO ? "Web Crypto present" : false,
+}, async () => {
+  const { result, calls } = await run(
+    { userAgent: CHROME_UA, headers: { referer: "https://chatgpt.com/" } },
+    { feed: CITATION_FEED },
+    CAPTURE,
+  );
+  assert.equal(result, undefined);
+  assert.equal(posted(calls, "/api/v1/edge/page-views").length, 0);
 });
 
 test("capture: no page-view without an AI referral, or with tracking off", async () => {
